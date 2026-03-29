@@ -17,7 +17,7 @@ while True:
         break
     if keytype==32:
         if count <max_no_image:   
-            filename=os.path.join(save_directory,  f"image_of_{user_Name}_{count+1}.jpg" )         
+            filename=os.path.join(save_directory,f"image_of_{user_Name}_{count+1}.jpg" )         
             cv2.imwrite(filename,imageframe)
             count=count+1
         else :
