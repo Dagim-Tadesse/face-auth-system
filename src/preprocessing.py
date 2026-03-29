@@ -2,9 +2,13 @@ import cv2
 import numpy as np
 import os
 
-face_crop = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+from config import IMAGE_SIZE
 
-def preprocess_image(image_path, target_size=(64, 64), to_gray=True):
+face_crop = cv2.CascadeClassifier(
+    cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+
+def preprocess_image(image_path, target_size=IMAGE_SIZE, to_gray=True):
     image_to_extract = cv2.imread(image_path)
 
     if image_to_extract is None:

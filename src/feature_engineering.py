@@ -1,8 +1,11 @@
-from preprocessing import preprocess_image
 import os
 import numpy as np
 
-def all_images(images_directory="src/data/raw"):
+from config import RAW_DIR
+from src.preprocessing import preprocess_image
+
+
+def all_images(images_directory=RAW_DIR):
     X, y = [], []
 
     for username in os.listdir(images_directory):
