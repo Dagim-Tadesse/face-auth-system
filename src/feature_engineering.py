@@ -1,4 +1,3 @@
-import os
 import numpy as np
 
 from config import RAW_DIR
@@ -6,27 +5,30 @@ from src.preprocessing import preprocess_image
 
 
 def all_images(images_directory=RAW_DIR):
+    """Load all user images and convert them into ML-ready features and labels."""
     X, y = [], []
 
-    for username in os.listdir(images_directory):
-        user_folder = os.path.join(images_directory, username)
+    if not images_directory.exists():
+        print(f"Images directory not found: {images_directory}")
+        return np.array(X), np.array(y)
 
-        if not os.path.isdir(user_folder):
+    for user_folder in images_directory.iterdir():
+        if not user_folder.is_dir():
             continue
 
-        for userimage in os.listdir(user_folder):
-            imagepath = os.path.join(user_folder, userimage)
+        username = user_folder.name
 
-            feature = preprocess_image(imagepath)
+        for image_path in user_folder.iterdir():
+            if not image_path.is_file():
+                continue
+
+            feature = preprocess_image(image_path)
 
             if feature is None:
-                print("The image is not processed correctly")
+                print(f"Skipping invalid image: {image_path}")
                 continue
 
             X.append(feature)
             y.append(username)
 
-    X = np.array(X)
-    y = np.array(y)
-
-    return X, y
+    return np.array(X), np.array(y)
