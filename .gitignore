@@ -1,3 +1,5 @@
 # add git data/row to git ignore because sequrity and privacy essue
 src/data/row
 venv
+# add raw face captures to git ignore because security and privacy issues
+data/raw/

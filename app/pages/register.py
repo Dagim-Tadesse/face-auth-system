@@ -1,6 +1,8 @@
 import streamlit as st
 import re
 from datetime import datetime
+import cv2
+import numpy as np
 
 # Regex pattern for valid names (letters, spaces, hyphens, apostrophes)
 NAME_REGEX = re.compile(r"^[A-Za-z\s\-']{2,50}$")
