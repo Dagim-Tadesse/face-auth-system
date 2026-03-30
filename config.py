@@ -18,10 +18,12 @@ RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 MODELS_DIR = PROJECT_ROOT / "models"
 MODEL_PATH = MODELS_DIR / "face_model.pkl"
+LABEL_ENCODER_PATH = MODELS_DIR / "label_encoder.pkl"
 
 IMAGE_SIZE = (64, 64)
 CAPTURE_COUNT = 15
 CONFIDENCE_THRESHOLD = 0.75
+TO_GRAY = True
 
 
 def user_raw_dir(username: str) -> Path:
