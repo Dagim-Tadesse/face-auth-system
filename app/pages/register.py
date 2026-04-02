@@ -11,7 +11,8 @@ import numpy as np
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from config import CAPTURE_COUNT, user_raw_dir, ensure_project_directories
+from config import CAPTURE_COUNT, user_raw_dir, ensure_project_directories, IMAGE_SIZE
+from src.preprocessing import get_preprocessed_face_image
 
 # Regex pattern for valid names (letters, spaces, hyphens, apostrophes)
 NAME_REGEX = re.compile(r"^[A-Za-z\s\-']{2,50}$")
@@ -278,11 +279,15 @@ if is_valid and not st.session_state.capture_complete:
             if len(faces) == 1 and (current_time - last_capture_time) > 0.5:
                 last_capture_time = current_time
                 
-                # Save the frame
-                filename = save_dir / f"image_of_{user_id}_{len(st.session_state.captured_images) + 1}.jpg"
-                cv2.imwrite(str(filename), frame)
+                # Use the shared preprocessing function to get the processed face image
+                processed_face = get_preprocessed_face_image(frame, target_size=IMAGE_SIZE)
                 
-                st.session_state.captured_images.append(str(filename))
+                if processed_face is not None:
+                    # Save the preprocessed face image
+                    filename = save_dir / f"image_of_{user_id}_{len(st.session_state.captured_images) + 1}.jpg"
+                    cv2.imwrite(str(filename), processed_face)
+                    
+                    st.session_state.captured_images.append(str(filename))
                 
                 # Update progress display
                 new_count = len(st.session_state.captured_images)
@@ -328,8 +333,8 @@ if st.session_state.capture_complete:
         if idx < len(st.session_state.captured_images):
             with col:
                 st.image(st.session_state.captured_images[idx], 
-                         caption=f"Image {idx + 1}", 
-                         width="stretch")
+                        caption=f"Image {idx + 1}", 
+                        width="stretch")
     
     # Show file locations
     st.markdown(f"""
@@ -349,6 +354,10 @@ if st.session_state.capture_complete:
             st.session_state.registered_user = user_name
             st.session_state.captured_images = []
             st.session_state.capture_complete = False
+            
+            # Invalidate login page cache so new user appears immediately
+            if "registered_users_cache" in st.session_state:
+                del st.session_state["registered_users_cache"]
 
     if st.button("Retake Photos", width="stretch"):
         # Clean up previously captured images
