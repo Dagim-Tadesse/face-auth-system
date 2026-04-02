@@ -3,3 +3,4 @@ src/data/row
 venv
 # add raw face captures to git ignore because security and privacy issues
 data/raw/
+__pycache__

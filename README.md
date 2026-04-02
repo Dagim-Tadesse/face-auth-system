@@ -55,6 +55,11 @@ Install the dependencies first, then run the app or pipeline modules from the pr
 ```bash
 pip install -r requirements.txt
 ```
+## How to run?
+We recommend to setting up a virtual environment and then run the following command:
+```sh
+streamlit run app/main.py 
+```
 
 ## Notes
 
