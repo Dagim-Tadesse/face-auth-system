@@ -1,0 +1,9 @@
+{
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "never",
+      "source.fixAll": "never",
+      "source.fixAll.ruff": "never"
+    }
+  }
+}

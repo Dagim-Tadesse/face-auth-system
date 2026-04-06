@@ -21,9 +21,21 @@ MODEL_PATH = MODELS_DIR / "face_model.pkl"
 LABEL_ENCODER_PATH = MODELS_DIR / "label_encoder.pkl"
 
 IMAGE_SIZE = (64, 64)
-CAPTURE_COUNT = 15
+CAPTURE_COUNT = 20
 CONFIDENCE_THRESHOLD = 0.75
+KNN_DISTANCE_THRESHOLD = 8.6
 TO_GRAY = True
+FACE_DETECTION_SCALE_FACTOR = 1.05
+FACE_DETECTION_MIN_NEIGHBORS = 8
+FACE_DETECTION_MIN_SIZE = (70, 70)
+FACE_EYE_DETECTION_MIN_NEIGHBORS = 3
+MIN_FACE_AREA_RATIO = 0.06
+# Webcam Laplacian variance is often much lower than still-image quality;
+# this value keeps a basic blur filter without blocking most live captures.
+MIN_FACE_SHARPNESS = 18.0
+MIN_FACE_BRIGHTNESS = 45.0
+MAX_FACE_BRIGHTNESS = 210.0
+MIN_FACE_CONTRAST = 16.0
 
 
 def user_raw_dir(username: str) -> Path:

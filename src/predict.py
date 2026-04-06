@@ -1,7 +1,7 @@
 import joblib
 import numpy as np
 
-from config import MODEL_PATH, LABEL_ENCODER_PATH, CONFIDENCE_THRESHOLD
+from config import MODEL_PATH, LABEL_ENCODER_PATH, KNN_DISTANCE_THRESHOLD
 from src.preprocessing import preprocess_image, preprocess_frame
 
 
@@ -59,10 +59,12 @@ class FacePredictor:
         feature = np.array(feature).reshape(1, -1)
 
         predicted_class = self.model.predict(feature)[0]
-        predicted_user = self.label_encoder.inverse_transform([predicted_class])[0]
+        predicted_user = self.label_encoder.inverse_transform([predicted_class])[
+            0]
 
-        confidence = self._calculate_confidence(feature, predicted_class)
-        accepted = confidence >= CONFIDENCE_THRESHOLD
+        confidence, average_distance = self._calculate_confidence(
+            feature, predicted_class)
+        accepted = average_distance <= KNN_DISTANCE_THRESHOLD
 
         if not accepted:
             predicted_user = "Unknown"
@@ -71,26 +73,27 @@ class FacePredictor:
             "success": True,
             "predicted_user": predicted_user,
             "confidence": round(confidence, 4),
+            "distance": round(average_distance, 4),
             "accepted": accepted,
             "message": "Prediction successful." if accepted else "Face not confidently recognized."
         }
 
     def _calculate_confidence(self, feature, predicted_class):
         """
-        Estimate confidence for KNN based on neighbor agreement.
-        Since KNN doesn't naturally output a true probability in a reliable way for this task,
-        we use predict_proba if available, otherwise neighbor voting.
+        Estimate confidence from the average distance to the three nearest neighbors.
+        This is stricter than raw vote confidence because a label only counts as accepted
+        when the face is actually close to known examples.
         """
-        try:
-            probabilities = self.model.predict_proba(feature)[0]
-            confidence = float(np.max(probabilities))
-            return confidence
-        except Exception:
-            # fallback method
-            neighbors = self.model.kneighbors(feature, return_distance=False)[0]
-            neighbor_labels = self.model._y[neighbors]
-            agreement = np.mean(neighbor_labels == predicted_class)
-            return float(agreement)
+        distances, neighbors = self.model.kneighbors(feature, n_neighbors=3)
+        average_distance = float(np.mean(distances[0]))
+
+        if KNN_DISTANCE_THRESHOLD <= 0:
+            confidence = 0.0
+        else:
+            confidence = float(
+                np.exp(-average_distance / KNN_DISTANCE_THRESHOLD))
+
+        return confidence, average_distance
 
 
 if __name__ == "__main__":
