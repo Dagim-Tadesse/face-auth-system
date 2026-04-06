@@ -1,68 +1,111 @@
-# Face Auth System
+# FaceAuth AI Login System
 
-This project is a face-authentication prototype with a shared folder contract:
+FaceAuth is a capstone project that provides end-to-end face registration and login with a machine learning pipeline and a Streamlit interface.
 
-- Raw captures live in `data/raw/<username>/`
-- Processed artifacts live in `data/processed/`
-- Trained models live in `models/`
-- The canonical model path is `models/face_model.pkl`
+## Project Scope
 
-## Module Interfaces
+- Register users by capturing face images.
+- Train a classifier on extracted face features.
+- Authenticate users from live webcam frames.
+- Accept or deny access using a confidence threshold.
 
-These are the expected inputs and outputs for each module so the team can work independently without hardcoding different paths or names.
+## Folder Structure
 
-### `src/data_collection.py`
+face-auth-system/
 
-- Exposes: `capture_images(username: str) -> None`
-- Responsibility: capture webcam images for one user and save them into `data/raw/<username>/`
-- Output: raw image files only
-
-### `src/preprocessing.py`
-
-- Exposes: `preprocess_image(image_path: str, target_size=(64, 64), to_gray=True)`
-- Responsibility: load one image, detect a face, crop it, resize it, normalize it, and flatten it
-- Output: one feature vector or `None` if the image cannot be processed
-
-### `src/feature_engineering.py`
-
-- Exposes: `all_images(images_directory=RAW_DIR)`
-- Responsibility: walk through `data/raw/`, preprocess each image, and return training arrays
-- Output: `X` feature matrix and `y` label array
-
-### `src/train.py`
-
-- Expected interface: accept `X` and `y`, train the model, and save it to `models/face_model.pkl`
-- Output: persisted model file
-
-### `src/predict.py`
-
-- Expected interface: accept one face image or feature vector and return a predicted label plus confidence
-- Acceptance rule: the prediction should be treated as valid only if confidence is at or above the shared threshold in `config.py`
-
-### `src/evaluate.py`
-
-- Expected interface: measure model performance on held-out data and report accuracy or similar metrics
-
-### `app/main.py` and `app/pages/*`
-
-- Expected interface: provide the Streamlit shell for registration and login flows
-- Responsibility: call into the shared `src/` modules instead of re-implementing capture, preprocessing, or prediction logic
+- app/
+  - main.py
+  - pages/login.py
+  - pages/register.py
+  - utils.py
+- data/
+  - raw/
+  - processed/
+- models/
+- src/
+  - data_collection.py
+  - preprocessing.py
+  - feature_engineering.py
+  - train.py
+  - evaluate.py
+  - predict.py
+- tests/
+  - test_pipeline.py
+- notebooks/
+  - exploration.ipynb
+- config.py
+- requirements.txt
+- REPORT.md
 
 ## Setup
 
-Install the dependencies first, then run the app or pipeline modules from the project root.
+1. Create and activate a virtual environment.
+2. Install dependencies:
 
-```bash
 pip install -r requirements.txt
-```
-## How to run?
-We recommend to setting up a virtual environment and then run the following command:
-```sh
-streamlit run app/main.py 
-```
+
+## Run Application
+
+Run from project root:
+
+streamlit run app/main.py
+
+## ML Pipeline Commands
+
+Train model:
+
+python src/train.py
+
+Evaluate model:
+
+python src/evaluate.py
+
+Run baseline tests:
+
+python -m unittest tests/test_pipeline.py
+
+## Features Implemented
+
+- Registration page with auto-capture.
+- Login page with webcam-based authentication flow.
+- Face detection and preprocessing with OpenCV.
+- KNN-based classification with saved model and label encoder.
+- Quality checks for low-quality registration frames.
+- Confidence gating to reduce false positive authentication.
+
+## Screenshots
+
+### Home
+
+![Home](data/screenshots/Home.png)
+
+### Registration
+
+![Register Start](data/screenshots/Register-start.png)
+![Register Webcam Open](data/screenshots/Register-clear-capture.png)
+![Register Low Quality Warning](data/screenshots/Register-unclear-capture.png)
+![Register Duplicate Username Warning](data/screenshots/Register-username.png)
+![Register Train Model](data/screenshots/Register-train.png)
+![Register Check Quality](data/screenshots/Register-check-quality.png)
+
+### Login
+
+![Login Start](data/screenshots/Login-start.png)
+![Login Webcam Open](data/screenshots/Login-webcam-open.png)
+![Login Scanning](data/screenshots/Login-scanning.png)
+![Login Success](data/screenshots/Login-success.png)
+![Login Failed](data/screenshots/Login-failed.png)
+
+## Deliverables Checklist
+
+- Working registration and login application.
+- Machine learning training and evaluation pipeline.
+- Configuration and shared project contract.
+- Report document in REPORT.md.
+- Baseline automated tests.
 
 ## Notes
 
-- Keep face images out of version control.
-- Keep all path values in `config.py`.
-- Do not introduce new folder names for raw captures unless the shared contract changes for everyone.
+- Keep dataset images out of source control.
+- Better recognition requires diverse registration images, not repeated duplicates.
+- Threshold values and quality settings are maintained in config.py.
